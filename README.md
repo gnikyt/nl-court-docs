@@ -1,52 +1,103 @@
 # NL Court Docs
 
-A script to parse the NL Court Docs with a supplied office ID and convert the docket data into readable JSON.
+A tool to parse the NL Court Docs with a supplied date and office ID.
 
 ## Building
 
-`go build -o build/docket ./...`.
+`go build -o build/docket cmd/docket.go`.
 
 ## Running
 
-`build/docket [office]`, example `build/docket 7`.
+`build/docket [date] [office] [json|text]`
 
-## Example Output
+Example: `build/docket 2023-09-08 7 text`.
 
-Will categorize by time, then person. With each person contianing a list of charges and the number of occurrences of those charges.
+## Usage
+
+```go
+import (
+  ncd "github.com/gnikyt/nl-court-docs"
+)
+
+// ...
+
+// Grab today's docket for office #7.
+d := ncd.NewDocket(time.Now().Format("2006-01-02"), "7", &http.client{})
+res, err := d.Fetch()
+if err != nil {
+    log.Fatal(err)
+}
+d.Parse(res)
+
+// Output as JSON.
+j := ncd.OutputJSON(d, true)
+fmt.Println(j)
+
+// Output as text.
+txt := ncd.OutputText(d)
+fmt.Println(txt)
+```
+
+Output of the above example will categorize by time, then person. With each person contianing a list of charges and the number of occurrences of those charges.
+
+Example (JSON):
 
 ```json
 {
-    "09:30 AM": {
-        "DOE, JOHN FOO": [
-            [
-                "Assault",
-                "1"
-            ]
-        ],
-        "DOE, JANE MARIA": [
-            [
-                "Operation of a conveyance while impaired",
-                "1"
-            ],
-            [
-                "Failure or refusal to comply with demand",
-                "1"
-            ],
-            [
-                "Dangerous operation of a conveyance",
-                "1"
-            ],
-            [
-                "Resisting or obstructing a Peace Officer",
-                "1"
-            ],
-            [
-                "Assaulting a peace officer/resisting arrest",
-                "2"
-            ]
-        ],
-      // ...
-    }
+  "09:30 AM": {
+    "DOE, JOHN FOO": [
+      {
+        "Description": "Assault",
+        "Count": "1"
+      }
+    ],
+    "DOE, JANE MARIA": [
+      {
+        "Description": "Operation of a conveyance while impaired",
+        "Count": "1"
+      },
+      {
+        "Description": "Failure or refusal to comply with demand",
+        "Count": "1"
+      },
+      {
+        "Description": "Dangerous operation of a conveyance",
+        "Count": "1"
+      },
+      {
+        "Description": "Resisting or obstructing a Peace Officer",
+        "Count": "1"
+      },
+      {
+        "Description": "Assaulting a peace officer/resisting arrest",
+        "Count": "2"
+      }
+    ],
     // ...
+  }
+  // ...
 }
 ```
+
+Example (text):
+
+```text
+>> 09:30AM
+DOE, JOHN FOO
+-------------
+* Assult
+
+DOE, JANE MARIA
+---------------
+* Operation of a conveyance while impaired
+* Failure or refusal to comply with demand
+* Dangerous operation of a conveyance
+* Resisting or obstructing a Peace Officer
+* Assaulting a peace officer/resisting arrest (2 counts)
+```
+
+You can use the package to create your own output implementations such as saving to a database.
+
+## TODO
+
+Make README better.
