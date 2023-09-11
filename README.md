@@ -25,17 +25,23 @@ import (
 d := ncd.NewDocket(time.Now().Format("2006-01-02"), "7", &http.client{})
 res, err := d.Fetch()
 if err != nil {
-    log.Fatal(err)
+  log.Fatal(err)
 }
-d.Parse(res)
+if err := d.Parse(res); err != nil {
+  log.Fatal(err)
+}
 
 // Output as JSON.
-j := ncd.OutputJSON(d, true)
-fmt.Println(j)
+j := ncd.NewPrettyJSONOutput(d.Data) // or ncd.NewJSONOutput for non-pretty.
+out, err := j.Format()
+if err != nil {
+  fmt.Print(out)
+}
 
 // Output as text.
-txt := ncd.OutputText(d)
-fmt.Println(txt)
+txt := ncd.NewTextOutput(d.Data)
+out, _ := txt.Format()
+fmt.Print(out)
 ```
 
 Output of the above example will categorize by time, then person. With each person contianing a list of charges and the number of occurrences of those charges.

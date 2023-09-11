@@ -12,20 +12,36 @@ type Outputter interface {
 	Format() (*bytes.Buffer, error)
 }
 
-// JSONOutputter will format the docket data as JSON.
-type JSONOutputter struct {
-	Data   DocketMapping // docket data.
-	Pretty bool          // print pretty JSON or not.
+// JSONOutput will format the docket data as JSON.
+type JSONOutput struct {
+	DocketMapping      // docket data.
+	Pretty        bool // print pretty JSON or not.
+}
+
+// NewJSONOutut returns a JSONOutput with non-pretty formatting.
+func NewJSONOutput(dm DocketMapping) JSONOutput {
+	return JSONOutput{
+		DocketMapping: dm,
+		Pretty:        false,
+	}
+}
+
+// NewPrettyJSONOutut returns a JSONOutputter with pretty formatting.
+func NewPrettyJSONOutput(dm DocketMapping) JSONOutput {
+	return JSONOutput{
+		DocketMapping: dm,
+		Pretty:        true,
+	}
 }
 
 // Implements Format for Outputter.
-func (jo JSONOutputter) Format() (*bytes.Buffer, error) {
+func (jo JSONOutput) Format() (*bytes.Buffer, error) {
 	var j []byte
 	var err error
 	if jo.Pretty {
-		j, err = json.MarshalIndent(jo.Data, "", "    ")
+		j, err = json.MarshalIndent(jo.DocketMapping, "", "    ")
 	} else {
-		j, err = json.Marshal(jo.Data)
+		j, err = json.Marshal(jo.DocketMapping)
 	}
 	if err != nil {
 		return nil, err
@@ -35,15 +51,20 @@ func (jo JSONOutputter) Format() (*bytes.Buffer, error) {
 	return out, nil
 }
 
-// TextOutputter will format the docket data as plain text.
-type TextOutputter struct {
-	Data DocketMapping // docket data.
+// TextOutput will format the docket data as plain text.
+type TextOutput struct {
+	DocketMapping // docket data.
+}
+
+// NewTextOutput returns a TextOutputter.
+func NewTextOutput(dm DocketMapping) TextOutput {
+	return TextOutput{dm}
 }
 
 // Implements Format for Outputter.
-func (to TextOutputter) Format() (*bytes.Buffer, error) {
+func (to TextOutput) Format() (*bytes.Buffer, error) {
 	out := &bytes.Buffer{}
-	for t, cas := range to.Data {
+	for t, cas := range to.DocketMapping {
 		out.WriteString(fmt.Sprintf(">> %s\n", t))
 		for ca, crgs := range cas {
 			ccnt := 0
