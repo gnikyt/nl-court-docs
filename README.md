@@ -4,11 +4,11 @@ A tool to parse the NL Court Docs with a supplied date and office ID.
 
 ## Building
 
-`go build -o build/docket cmd/docket.go`.
+`make build`.
 
 ## Running
 
-`build/docket [date] [office] [json|text]`
+`dist/docket [date] [office] [json|text]`
 
 Example: `build/docket 2023-09-08 7 text`.
 
@@ -44,8 +44,6 @@ out, _ = d.Output(ncd.NewTextOutput(d.Data))
 fmt.Print(out)
 ```
 
-Output of the above example will categorize by time, then person. With each person contianing a list of charges and the number of occurrences of those charges.
-
 Example (JSON):
 
 ```json
@@ -79,9 +77,9 @@ Example (JSON):
         "Count": "2"
       }
     ],
-    // ...
-  }
-  // ...
+    ["// ..."]
+  },
+  {"// ..."}
 }
 ```
 
@@ -104,6 +102,21 @@ DOE, JANE MARIA
 
 You can use the package to create your own output implementations such as saving to a database.
 
-## TODO
+## API
 
-Make README better.
+Running `make docs` outputs the following:
+
+```go
+package ncd // import "github.com/gnikyt/nl-court-docs"
+
+type Charge struct{ ... }
+type Docket struct{ ... }
+    func NewDocket(date string, office string, client *http.Client) *Docket
+type DocketMapping = map[string]map[string][]Charge
+type JSONOutput struct{ ... }
+    func NewJSONOutput(dm DocketMapping) JSONOutput
+    func NewPrettyJSONOutput(dm DocketMapping) JSONOutput
+type Outputter interface{ ... }
+type TextOutput struct{ ... }
+    func NewTextOutput(dm DocketMapping) TextOutput
+```
