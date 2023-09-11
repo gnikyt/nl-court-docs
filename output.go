@@ -2,8 +2,10 @@ package ncd
 
 import (
 	"bytes"
+	"encoding/csv"
 	"encoding/json"
 	"fmt"
+	"strconv"
 	"strings"
 )
 
@@ -12,30 +14,30 @@ type Outputter interface {
 	Format() (*bytes.Buffer, error)
 }
 
-// JSONOutput will format the docket data as JSON.
-type JSONOutput struct {
+// JsonOutput will format the docket data as Json.
+type JsonOutput struct {
 	DocketMapping      // docket data.
-	Pretty        bool // print pretty JSON or not.
+	Pretty        bool // print pretty Json or not.
 }
 
-// NewJSONOutut returns a JSONOutput with non-pretty formatting.
-func NewJSONOutput(dm DocketMapping) JSONOutput {
-	return JSONOutput{
+// NewJsonOutut returns a JsonOutput with non-pretty formatting.
+func NewJsonOutput(dm DocketMapping) JsonOutput {
+	return JsonOutput{
 		DocketMapping: dm,
 		Pretty:        false,
 	}
 }
 
-// NewPrettyJSONOutut returns a JSONOutputter with pretty formatting.
-func NewPrettyJSONOutput(dm DocketMapping) JSONOutput {
-	return JSONOutput{
+// NewPrettyJsonOutut returns a JsonOutputter with pretty formatting.
+func NewPrettyJsonOutput(dm DocketMapping) JsonOutput {
+	return JsonOutput{
 		DocketMapping: dm,
 		Pretty:        true,
 	}
 }
 
 // Implements Format for Outputter.
-func (jo JSONOutput) Format() (*bytes.Buffer, error) {
+func (jo JsonOutput) Format() (*bytes.Buffer, error) {
 	var j []byte
 	var err error
 	if jo.Pretty {
@@ -84,6 +86,35 @@ func (to TextOutput) Format() (*bytes.Buffer, error) {
 			}
 			out.WriteString("\n")
 		}
+	}
+	return out, nil
+}
+
+// CsvOutput will format the docket data as CSV in the format of:
+// [time],[case],[charge],[count].
+type CsvOutput struct {
+	DocketMapping // docket data.
+}
+
+// NewCsvOutput returns a CsvOutput.
+func NewCsvOutput(dm DocketMapping) CsvOutput {
+	return CsvOutput{dm}
+}
+
+// Implements Format for Outputter.
+func (cv CsvOutput) Format() (*bytes.Buffer, error) {
+	out := &bytes.Buffer{}
+	csv := csv.NewWriter(out)
+	for t, cas := range cv.DocketMapping {
+		for ca, crgs := range cas {
+			for _, crg := range crgs {
+				csv.Write([]string{t, ca, crg.Description, strconv.FormatInt(int64(crg.Count), 10)})
+			}
+		}
+	}
+	csv.Flush()
+	if err := csv.Error(); err != nil {
+		return nil, err
 	}
 	return out, nil
 }

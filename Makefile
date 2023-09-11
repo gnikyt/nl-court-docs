@@ -1,10 +1,11 @@
 BINARY_NAME=docket
 PKG=github.com/gnikyt/nl-court-docs
+CMD=cmd/docket.go
 
 all: clean build
 
 build:
-	go build -o ./dist/${BINARY_NAME} ${PKG}
+	go build -o ./dist/${BINARY_NAME} ./${CMD}
 
 clean:
 	go clean

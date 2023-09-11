@@ -19,10 +19,14 @@ func main() {
 	}
 
 	var out ncd.Outputter
-	if os.Args[3] == "json" {
-		out = ncd.NewPrettyJSONOutput(d.Data)
-	} else {
+	switch os.Args[3] {
+	default:
+	case "json":
+		out = ncd.NewPrettyJsonOutput(d.Data)
+	case "text":
 		out = ncd.NewTextOutput(d.Data)
+	case "csv":
+		out = ncd.NewCsvOutput(d.Data)
 	}
 	fmr, err := d.Output(out)
 	if err != nil {
