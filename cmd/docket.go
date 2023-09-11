@@ -24,7 +24,7 @@ func main() {
 	} else {
 		out = ncd.NewTextOutput(d.Data)
 	}
-	fmr, err := out.Format()
+	fmr, err := d.Output(out)
 	if err != nil {
 		log.Fatal(err)
 	}

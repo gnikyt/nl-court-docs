@@ -33,14 +33,15 @@ if err := d.Parse(res); err != nil {
 
 // Output as JSON.
 j := ncd.NewPrettyJSONOutput(d.Data) // or ncd.NewJSONOutput for non-pretty.
-out, err := j.Format()
+out, err := d.Output(j)
 if err != nil {
-  fmt.Print(out)
+  log.Fatal(err)
 }
+fmt.Print(out)
 
 // Output as text.
 txt := ncd.NewTextOutput(d.Data)
-out, _ := txt.Format()
+out, _ := d.Output(txt)
 fmt.Print(out)
 ```
 
