@@ -10,11 +10,17 @@ You can use the builtin command for default outputs, or write your own with the 
 
 ### Running
 
-`dist/docket [date] [office] [json|text]`
+    Usage:
+      -date string
+            date in YYYY-MM-DD format, no past values (default "2023-09-11")
+      -format string
+            format: json, text, or csv (default "json")
+      -office string
+            office ID
 
-Example: `build/docket 2023-09-08 7 text`.
+Example: `build/docket -office 7 -format text` will output in text format, for office #7, for the current date.
 
-## Usage
+## Package
 
 ```go
 import (
@@ -120,11 +126,11 @@ DOE, JANE MARIA
 09:30AM,"DOE, JANE MARIA",Assaulting a peace officer/resisting arrest,2
 ```
 
-You can use the package to create your own output implementations such as saving to a database.
+You can use the package API to create your own output implementations, such as saving to a database.
 
 ## API
 
-Running `make docs` outputs the following:
+Running `make docs`:
 
 ```go
 package ncd // import "github.com/gnikyt/nl-court-docs"
