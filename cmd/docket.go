@@ -16,14 +16,15 @@ func main() {
 	}
 	d.Parse(res)
 
+	var out ncd.Outputter
 	if os.Args[3] == "json" {
-		out, err := ncd.OutputJSON(d, true)
-		if err != nil {
-			log.Fatal(err)
-		}
-		fmt.Print(string(out))
+		out = ncd.JSONOutputter{Data: d.Data, Pretty: true}
 	} else {
-		out := ncd.OutputText(d)
-		fmt.Print(out)
+		out = ncd.TextOutputter{Data: d.Data}
 	}
+	fmr, err := out.Format()
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Print(fmr)
 }

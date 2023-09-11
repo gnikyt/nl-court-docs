@@ -9,6 +9,9 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
+// Alias type for the docket data container.
+type DocketMapping = map[string]map[string][]Charge
+
 // Charge represents a charge for a case.
 type Charge struct {
 	Description string // description of the charge.
@@ -27,11 +30,11 @@ func (c Charge) HasMultiple() bool {
 
 // Docket represents the data parsed from the Court Docket.
 type Docket struct {
-	Data        map[string]map[string][]Charge // format of... { [time]: [{ [name]: [[charge, count]] }] }.
-	Office      string                         // which office for the docket.
-	Date        string                         // which date for the docket.
-	Client      *http.Client                   // HTTP client handler.
-	currentTime string                         // current time slot.
+	Data        DocketMapping // format of... { [time]: [{ [name]: [{ Description: [charge], Count: [count] }] } }.
+	Office      string        // which office for the docket.
+	Date        string        // which date for the docket.
+	Client      *http.Client  // HTTP client handler.
+	currentTime string        // current time slot.
 }
 
 // NewDocket inits a Docket struct.
@@ -142,6 +145,15 @@ func (d *Docket) Parse(res *http.Response) error {
 		}
 	})
 	return nil
+}
+
+// Output accepts an Outputter and returns a string.
+func (d *Docket) Output(out Outputter) (string, error) {
+	res, err := out.Format()
+	if err != nil {
+		return "", err
+	}
+	return res.String(), nil
 }
 
 // clean removes linebreaks, non-breaking spaces, and multiple spaces
