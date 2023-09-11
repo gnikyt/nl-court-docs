@@ -2,11 +2,13 @@
 
 A tool to parse the NL Court Docs with a supplied date and office ID.
 
+You can use the builtin command for default outputs, or write your own with the package API.
+
 ## Building
 
 `make build`.
 
-## Running
+### Running
 
 `dist/docket [date] [office] [json|text]`
 
@@ -51,7 +53,7 @@ if err != nil {
 fmt.Print(out)
 ```
 
-Example (JSON):
+### Example (JSON)
 
 ```json
 {
@@ -90,7 +92,7 @@ Example (JSON):
 }
 ```
 
-Example (text):
+### Example (text)
 
 ```text
 >> 09:30AM
@@ -107,7 +109,7 @@ DOE, JANE MARIA
 * Assaulting a peace officer/resisting arrest (2 counts)
 ```
 
-Example (CSV):
+### Example (CSV)
 
 ```csv
 09:30AM,"DOE, JOHN FOO",Assult,1
