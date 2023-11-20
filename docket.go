@@ -80,7 +80,10 @@ func (d *Docket) AddCharge(cas string, charge string) {
 		ncrg = "(empty)"
 	} else {
 		// Parse the charge, removing the article.
-		ncrg = strings.Split(ncrg, "] ")[1]
+		scrg := strings.Split(ncrg, "] ")
+		if len(scrg) == 2 {
+			ncrg = scrg[1]
+		}
 	}
 	// Check if the charge already exists.
 	idx := -1
